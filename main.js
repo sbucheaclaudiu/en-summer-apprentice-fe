@@ -1,10 +1,4 @@
-// Imports
-import { addEvents, handleSearch } from './src/utils';
-import { createOrderItem } from './src/components/createOrderItem.js';
-import { getTicketCategories } from './src/components/api/getTicketCategories.js';
-import { removeLoader, addLoader } from './src/components/loader';
-import './src/mocks/handlers';
-
+import { addEvents } from './src/utils';
 let events = null;
 
 // Navigate to a specific URL
@@ -12,96 +6,31 @@ function navigateTo(url) {
   history.pushState(null, null, url);
   renderContent(url);
 }
+
 // HTML templates
 function getHomePageTemplate() {
   return `
-   <div id="content" class="hidden">
-      <img src="./src/assets/Endava.png" alt="summer">
-      <div class="flex flex-col items-center">
-        <div class="w-80">
-          <h1>Explore Events</h1>
-          <div class="filters flex flex-col">
-            <input type="text" id="filter-name" placeholder="Filter by name" class="px-4 mt-4 mb-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
-            <button id="filter-button" class="px-4 py-2 text-white filter-btn rounded-lg">Filter</button>
-          </div>
-        </div>
-      </div>
+  <div id="content" >
       <div class="events flex items-center justify-center flex-wrap">
       </div>
-      <div class="cart"></div>
-    </div>
-  `;
+  </div>
+`;
 }
 
 function getOrdersPageTemplate() {
   return `
-      <div id="content" class="hidden">
-        <h1 class="text-2xl mb-4 mt-8 text-center">Purchased Tickets</h1>
-        <div class="purchases ml-6 mr-6">
-          <div class="bg-white px-4 py-3 gap-x-4 flex font-bold">
-            <span class="flex-1">Name</span>
-            <span class="flex-1 flex justify-end">Nr tickets</span>
-            <span class="flex-1">Category</span>
-            <span class="flex-1 hidden md:flex">Date</span>
-            <span class="w-12 text-center hidden md:flex">Price</span>
-            <span class="w-28 sm:w-8"></span>
-          </div>
-        </div>
+  <div id="content" class="hidden">
+    <div class="flex flex-col items-center">
+      <div class="w-80">
+        <h1>Explore Events</h1>
       </div>
+    </div>
+    <div class="events flex items-center justify-center flex-wrap">
+    </div>
+  </div>
   `;
 }
 
-function liveSearch() {
-  const filterInput = document.querySelector('#filter-name');
-
-  if(filterInput) {
-    const searchValue = filterInput.value;
-    
-    if(searchValue) {
-      const filteredEvents = events.filter(event => event.name.toLowerCase().includes(searchValue.toLowerCase()));
-    
-      addEvents(filteredEvents);
-    }
-  }
-
-}
-
-function setupFilterEvents() {
-  const nameFilterInput = document.querySelector('#filter-name');
-
-  if(nameFilterInput) {
-    const filterInterval = 500;
-
-    nameFilterInput.addEventListener('keyup', () => {
-      setTimeout(liveSearch, filterInterval);
-    });
-  }
-}
-
-function setupSearchEvents() {
-  const searchForm = document.querySelector('.search-form');
-  const searchInput = document.querySelector('.search-input');
-  const searchButton = document.querySelector('.search-button');
-  const eventSection = document.querySelector('.events');
-
-  
-  if(searchForm) {
-    searchForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const searchTerm = searchInput.value.trim().toLowerCase();
-      const resultsFound = await handleSearch(searchTerm);
-      if (!resultsFound) {
-        eventSection.innerHTML = 'No results found';
-      }
-    });
-  }
-
-  if(searchButton) {
-    searchButton.addEventListener('click', () => {
-      searchInput.classList.toggle('active');
-    });
-  }
-}
 
 function setupNavigationEvents() {
   const navLinks = document.querySelectorAll('nav a');
@@ -137,10 +66,23 @@ function setupInitialPage() {
   renderContent(initialUrl);
 }
 
-async function fetchTicketEvents() {
-  const response = await fetch('/api/ticketEvents');
-  const data = await response.json();
+function loadImage(data) {
+  data.forEach(event => {
+    if(event.eventName == "Untold") event.photo = "src/assets/untold.jpg"
+    else if(event.eventName == "Electric Castle") event.photo = "src/assets/electric.jpeg"
+    else if(event.eventName == "Meci de fotbal") event.photo = "src/assets/game.jpg"
+    else if(event.eventName == "Wine Festival") event.photo = "src/assets/wine.jpg"
+  });
+
   return data;
+}
+
+
+async function fetchEvents() {
+  const response = await fetch('http://localhost:8080/api/events', {mode:'cors'});
+  const data = await response.json();
+
+  return loadImage(data);
 }
 
 async function fetchOrders() {
@@ -149,71 +91,32 @@ async function fetchOrders() {
   return orders;
 }
 
-function renderHomePage() {
+async function renderHomePage() {
   const mainContentDiv = document.querySelector('.main-content-component');
   mainContentDiv.innerHTML = getHomePageTemplate();
 
-  setupFilterEvents();
-  setupSearchEvents();
-  addLoader();
-
-  fetchTicketEvents()
+  fetchEvents()
     .then((data) => {
-      events = data;
-      setTimeout(() => {
-        removeLoader();
-      }, 200);
-      addEvents(events);
+      addEvents(data);
     });
 }
 
-function renderOrdersPage(categories) {
-  const mainContentDiv = document.querySelector('.main-content-component');
-  mainContentDiv.innerHTML = getOrdersPageTemplate();
-
-  const purchasesDiv = document.querySelector('.purchases');
-  addLoader();
-
-  if (purchasesDiv) {
-    fetchOrders()
-      .then((orders) => {
-        if (orders.length > 0) {
-          setTimeout(() => {
-            removeLoader();
-          }, 200);
-          orders.forEach((order) => {
-            const newOrder = createOrderItem(categories, order);
-            purchasesDiv.appendChild(newOrder);
-          });
-        } else {
-          removeLoader();
-        }
-      });
-  }
-}
+function renderOrdersPage() {}
 
 // Render content based on URL
 function renderContent(url) {
   const mainContentDiv = document.querySelector('.main-content-component');
   mainContentDiv.innerHTML = '';
 
-  if (url === '/') {
+  if (url === '/events') {
     renderHomePage();
   } else if (url === '/orders') {
-    getTicketCategories()
-      .then((categories) => {
-        renderOrdersPage(categories);
-      })
-      .catch((error) => {
-        console.error('Error fetching ticket categories:', error);
-      });
+    renderOrdersPage();
   }
 }
 
 
 // Call the setup functions
-setupFilterEvents();
-setupSearchEvents();
 setupNavigationEvents();
 setupMobileMenuEvent();
 setupPopstateEvent();
