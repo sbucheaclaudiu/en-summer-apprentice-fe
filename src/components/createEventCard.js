@@ -14,6 +14,7 @@ const createEventElement = (eventData) => {
 
   eventDiv.classList.add(...eventWrapperClasses);
 
+
   const contentMarkup = `
   <img src="${eventData.photo}" alt="${eventData.eventName}" class="event-image">
     <div class="content p-5">
