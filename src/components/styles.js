@@ -1,58 +1,7 @@
 const bookOfStyles = {
     purchase: [
-      'bg-white',
-      'px-4',
-      'py-3',
-      'gap-x-4',
-      'sm:border-b',
-      'sm:border-gray-200',
       'flex',
     ],
-    purchaseTitle: ['text-lg', 'font-medium', 'text-gray-900', 'flex-1'],
-    purchaseQuantity: [
-      'w-[50px]',
-      'text-center',
-      'py-1',
-      'px-2',
-      'border',
-      'border-orange-700',
-      'border-2',
-      'disabled:border-0',
-      'rounded',
-      'text-orange-700',
-      'text-sm',
-      'leading-tight',
-      'font-bold',
-      'disabled:text-gray-700',
-      'focus:outline-none',
-      'focus:shadow-outline',
-    ],
-    purchaseQuantityWrapper: ['flex', 'flex-row', 'justify-end', 'flex-1'],
-    purchaseType: [
-      'w-fit',
-      'py-1',
-      'px-2',
-      'border',
-      'border-orange-700',
-      'border-2',
-      'py-px',
-      'disabled:border-transparent',
-      'disabled:appearance-none',
-      'disabled:text-gray-900',
-      'disabled:border-2',
-      'disabled:pl-3',
-      'rounded',
-      'leading-tight',
-      'focus:outline-none',
-      'focus:shadow-outline',
-      'text-sm',
-      'font-bold',
-      'text-orange-700',
-      'flex-1',
-    ],
-    purchaseTypeWrapper: ['flex', 'flex-row', 'justify-end', 'flex-1'],
-    purchaseDate: ['text-center', 'flex-1', 'hidden', 'md:flex'],
-    purchasePrice: ['text-center', 'w-12', 'hidden', 'md:flex'],
     actions: ['sm:mt-0', 'sm:text-right', 'w-28'],
     actionButton: [
       'ml-2',
@@ -80,7 +29,7 @@ const bookOfStyles = {
       'width-500',
     ],
   
-    actionsWrapper: ['actions', 'flex', 'items-center', 'px-4',],
+    actionsWrapper: ['actions', 'flex', 'items-center', 'px-5',],
   
     quantity: ['actions', 'flex', 'items-center', 'mt-4'],
   
@@ -98,7 +47,7 @@ const bookOfStyles = {
       'focus:shadow-outline',
     ],
   
-    quantityActions: ['quantity-actions', 'flex', 'space-x-2', 'ml-6'],
+    quantityActions: ['quantity-actions', 'flex', 'space-x-2', 'ml-6', 'w-fit'],
   
     increaseBtn: [
       'px-3',
@@ -131,6 +80,10 @@ const bookOfStyles = {
       'disabled:cursor-not-allowed',
       'focus:outline-none',
       'focus:shadow-outline',
+    ],
+    ticket: [
+      'text-center',
+      'flex-1',
     ],
   };
   

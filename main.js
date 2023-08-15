@@ -1,36 +1,9 @@
 import { addEvents } from './src/utils';
-let events = null;
-
-// Navigate to a specific URL
-function navigateTo(url) {
-  history.pushState(null, null, url);
-  renderContent(url);
-}
-
-// HTML templates
-function getHomePageTemplate() {
-  return `
-  <div id="content" >
-      <div class="events flex items-center justify-center flex-wrap">
-      </div>
-  </div>
-`;
-}
-
-function getOrdersPageTemplate() {
-  return `
-  <div id="content" class="hidden">
-    <div class="flex flex-col items-center">
-      <div class="w-80">
-        <h1>Explore Events</h1>
-      </div>
-    </div>
-    <div class="events flex items-center justify-center flex-wrap">
-    </div>
-  </div>
-  `;
-}
-
+import { createOrder } from './src/components/createOrder.js';
+import { removeLoader, addLoader } from './src/components/loader.js';
+import { getLocations, getEventTypes, loadImage } from './src/components/utils';
+import { getHomePageTemplate, getOrdersPageTemplate } from './src/components/pageTemplates';
+import { fetchEvents, fetchEventsByLocationAndEventType, fetchEventsByName, fetchOrders } from './src/components/fetchs';
 
 function setupNavigationEvents() {
   const navLinks = document.querySelectorAll('nav a');
@@ -66,57 +39,108 @@ function setupInitialPage() {
   renderContent(initialUrl);
 }
 
-function loadImage(data) {
-  data.forEach(event => {
-    if(event.eventName == "Untold") event.photo = "src/assets/untold.jpg"
-    else if(event.eventName == "Electric Castle") event.photo = "src/assets/electric.jpeg"
-    else if(event.eventName == "Meci de fotbal") event.photo = "src/assets/game.jpg"
-    else if(event.eventName == "Wine Festival") event.photo = "src/assets/wine.jpg"
+function navigateTo(url) {
+  history.pushState(null, null, url);
+  renderContent(url);
+}
+
+function setupSearchEvents() {
+  const searchInput = document.querySelector('.search-input');
+  const searchButton = document.querySelector('.search-button');
+
+  searchButton.addEventListener('click', () => {
+    handleSearchButton(searchInput);
   });
 
-  return data;
+  const filterButton = document.querySelector('.filter-button');
+  const filterLocation = document.querySelector('.filter-location');
+  const filterEventType = document.querySelector('.filter-eventType');
+
+  filterButton.addEventListener('click', () => {
+    handleFilterButton(filterLocation, filterEventType);
+  });
 }
 
+function handleFilterButton(filterLocation, filterEventType){
+  addLoader();
 
-async function fetchEvents() {
-  const response = await fetch('http://localhost:8080/api/events', {mode:'cors'});
-  const data = await response.json();
-
-  return loadImage(data);
-}
-
-async function fetchOrders() {
-  const response = await fetch('/api/orders');
-  const orders = await response.json();
-  return orders;
-}
-
-async function renderHomePage() {
-  const mainContentDiv = document.querySelector('.main-content-component');
-  mainContentDiv.innerHTML = getHomePageTemplate();
-
-  fetchEvents()
+  fetchEventsByLocationAndEventType(filterLocation, filterEventType)
     .then((data) => {
+      setTimeout(() => {
+        removeLoader();
+      }, 200);
       addEvents(data);
     });
 }
 
-function renderOrdersPage() {}
+function handleSearchButton(searchInput){
+  addLoader();
+
+  fetchEventsByName(searchInput.value)
+    .then((data) => {
+      setTimeout(() => {
+        removeLoader();
+      }, 200);
+      addEvents(data);
+    });
+}
+
+async function renderEventPage(events) {
+  const locations = getLocations(events);
+  const eventTypes = getEventTypes(events);
+
+  const mainContentDiv = document.querySelector('.main-content-component');
+  mainContentDiv.innerHTML = getHomePageTemplate(locations, eventTypes);
+  addLoader();
+
+  fetchEvents()
+    .then((data) => {
+      setTimeout(() => {
+        removeLoader();
+      }, 200);
+      addEvents(data);
+    });
+}
+
+async function renderOrdersPage() {
+  const mainContentDiv = document.querySelector('.main-content-component');
+  mainContentDiv.innerHTML = getOrdersPageTemplate();
+
+  const purchasesDiv = document.querySelector('.purchases');
+  addLoader();
+
+  if (purchasesDiv) {
+    fetchOrders()
+      .then((orders) => {
+        if (orders.length > 0) {
+          setTimeout(() => {
+            removeLoader();
+          }, 200);
+          orders.forEach((order) => {
+            const newOrder = createOrder(order);
+            purchasesDiv.appendChild(newOrder);
+          });
+        }
+      });
+  }
+}
 
 // Render content based on URL
-function renderContent(url) {
+async function renderContent(url) {
   const mainContentDiv = document.querySelector('.main-content-component');
   mainContentDiv.innerHTML = '';
 
+  const events = await fetchEvents();
+
   if (url === '/events') {
-    renderHomePage();
+    renderEventPage(events);
+    setupSearchEvents();
   } else if (url === '/orders') {
     renderOrdersPage();
   }
 }
 
 
-// Call the setup functions
 setupNavigationEvents();
 setupMobileMenuEvent();
 setupPopstateEvent();

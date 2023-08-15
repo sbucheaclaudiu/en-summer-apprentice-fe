@@ -18,8 +18,14 @@ const createEventElement = (eventData) => {
   <img src="${eventData.photo}" alt="${eventData.eventName}" class="event-image">
     <div class="content p-5">
       <p class="event-title text-2xl font-bold">${eventData.eventName}</p>
-      <p class="description text-gray-700">${eventData.description}</p>
-      <p class="date text-gray-700">Date: ${eventData.startDate.slice(0,10)} - ${eventData.endDate.slice(0,10)}</p>
+      <div class="flex">
+        <i class="fa-solid fa-circle-info" style="color: #d95000;"></i>
+        <p class="description text-gray-700">&nbsp&nbsp${eventData.description}</p>
+      </div>
+      <div class="flex">
+        <i class="fa-solid fa-calendar-days" style="color: #d95000;"></i>
+        <p class="date text-gray-700">&nbsp&nbsp${eventData.startDate.slice(0,10)} - ${eventData.endDate.slice(0,10)}</p>
+      </div>
     </div>
   `;
   eventDiv.innerHTML = contentMarkup;
@@ -30,12 +36,14 @@ const createEventElement = (eventData) => {
 
   const categoriesOptions = eventData.ticketCategoryList.map(
     (tc) =>
-      `<option value=${tc.ticketCategoryID}>${tc.description}  $${tc.price}</option>`
+      `<option value=${tc.ticketCategoryID}>${tc.description} &nbsp $${tc.price}</option>`
   );
+
+  const eventNameWithoutSpaces = eventData.eventName.replace(/\s/g, '');
 
   const ticketTypeMarkup = `
     <p>Tipul biletului:</p>
-    <select id="ticketType" name="ticketType" class="select ${eventData.eventName}-ticket-type border">
+    <select id="ticketType" name="ticketType" class="select ${eventNameWithoutSpaces}-ticket-type border">
       ${categoriesOptions.join('\n')}
     </select>
   `;
@@ -75,6 +83,7 @@ const createEventElement = (eventData) => {
   const increase = document.createElement('button');
   increase.classList.add(...increaseBtnClasses);
   increase.innerText = '+';
+
   increase.addEventListener('click', () => {
     input.value = parseInt(input.value) + 1;
     const currentQuantity = parseInt(input.value);
@@ -115,19 +124,18 @@ const createEventElement = (eventData) => {
   addToCart.disabled = true;
 
   addToCart.addEventListener('click', () => {
-    handleAddToCart(eventData.eventName, eventData.eventID, input, addToCart);
+    handleAddToCart(eventNameWithoutSpaces, eventData.eventID, input, addToCart);
   });
+  
   eventFooter.appendChild(addToCart);
   eventDiv.appendChild(eventFooter);
 
   return eventDiv;
 };
 
-const handleAddToCart = (name, id, input, addToCart) => {
-  const ticketType = document.querySelector(`.${name}-ticket-type`).value;
+const handleAddToCart = (eventNameWithoutSpaces, id, input, addToCart) => {
+  const ticketType = document.querySelector(`.${eventNameWithoutSpaces}-ticket-type`).value;
   const quantity = input.value;
-
-  console.log("ok", ticketType);
 
   if (parseInt(quantity)) {
     fetch('http://localhost:8080/api/orders', {
@@ -143,7 +151,6 @@ const handleAddToCart = (name, id, input, addToCart) => {
     })
       .then((response) => {
         return response.json().then((data) => {
-          console.log("ok", data);
           return data;
         });
       })
