@@ -155,9 +155,9 @@ const handleAddToCart = (eventNameWithoutSpaces, id, input, addToCart) => {
         });
       })
       .then((data) => {
-        //addPurchase(data);
         input.value = 0;
         addToCart.disabled = true;
+        toastr.success("Order saved!");
       })
       .catch((error) => {
         console.error('Error saving purchased event:', error);

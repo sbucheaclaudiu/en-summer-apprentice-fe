@@ -12,10 +12,11 @@ const bookOfStyles = {
       'text-gray-700',
     ],
     deleteButton: ['hover:text-red-500'],
-    cancelButton: ['hover:text-red-500'],
-    saveButton: ['hover:text-green-500'],
     editButton: ['hover:text-blue-500'],
-    hiddenButton: ['hidden'],
+    cancelButton: ['hidden',
+                   'hover:text-red-500'],
+    saveButton: ['hidden',
+                'hover:text-blue-500'],
   
     eventWrapper: [
       'event',

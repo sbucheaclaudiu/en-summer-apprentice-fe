@@ -59,10 +59,30 @@ function setupSearchEvents() {
   filterButton.addEventListener('click', () => {
     handleFilterButton(filterLocation, filterEventType);
   });
+
+  const deleteFilterButton = document.querySelector('.delete-filter-button')
+
+  deleteFilterButton.addEventListener('click', () => {
+    handleDeleteFilterButton(filterLocation, filterEventType);
+  });
 }
 
 function handleFilterButton(filterLocation, filterEventType){
   addLoader();
+
+  fetchEventsByLocationAndEventType(filterLocation, filterEventType)
+    .then((data) => {
+      setTimeout(() => {
+        removeLoader();
+      }, 200);
+      addEvents(data);
+    });
+}
+
+function handleDeleteFilterButton(filterLocation, filterEventType){
+  addLoader();
+  filterLocation.value = '';
+  filterEventType.value = '';
 
   fetchEventsByLocationAndEventType(filterLocation, filterEventType)
     .then((data) => {
