@@ -1,8 +1,11 @@
 const bookOfStyles = {
     purchase: [
       'flex',
+      'pt-4',
+      'order-div-line',
+      'hover:bg-gray-100',
+      'zoom-out-purchase',
     ],
-    actions: ['sm:mt-0', 'sm:text-right', 'w-28'],
     actionButton: [
       'ml-2',
       'text-xl',

@@ -1,3 +1,5 @@
+import { createOrder } from "./createOrder";
+
 export function getLocations(eventList){
     let locations = '';
     let locationsList = new Array();
@@ -40,3 +42,45 @@ export function loadImage(data) {
   
     return data;
   }
+
+export function sortOrdersByPrice(orders, direction) {
+  const ordersDiv = document.getElementById('orders-div-line');
+
+  if(direction === 'asc'){
+    orders.sort((a,b) => a.totalPrice - b.totalPrice);
+  }
+  
+  if(direction === 'desc'){
+    orders.sort((a,b) => b.totalPrice - a.totalPrice);
+  }
+
+  if(orders.length){
+    ordersDiv.innerHTML = '';
+
+    orders.forEach((order) => {
+      const newOrder = createOrder(order);
+      ordersDiv.appendChild(newOrder);
+    });
+  }
+}
+
+export function sortOrdersByName(orders, direction) {
+  const ordersDiv = document.getElementById('orders-div-line');
+
+  if(direction === 'asc'){
+    orders.sort((a,b) => a.event.eventName.localeCompare(b.event.eventName));
+  }
+  
+  if(direction === 'desc'){
+    orders.sort((a,b) => b.event.eventName.localeCompare(a.event.eventName));
+  }
+
+  if(orders.length){
+    ordersDiv.innerHTML = '';
+
+    orders.forEach((order) => {
+      const newOrder = createOrder(order);
+      ordersDiv.appendChild(newOrder);
+    });
+  }
+}

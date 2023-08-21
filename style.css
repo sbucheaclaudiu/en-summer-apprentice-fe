@@ -26,10 +26,8 @@ h1 {
 }
 
 .events {
-  padding-left: 10%;
-  padding-right: 10%;
+  padding: 10px;
   justify-content: center;
-  align-items: center;  
   flex-wrap: wrap;
 }
 
@@ -172,6 +170,7 @@ svg {
   color: white;
   border-style: solid;
   border: white 2px;
+  border: 2px solid white;
 }
 
 .search-button {
@@ -206,7 +205,8 @@ svg {
 
 
 .select-div {
-  padding: 10px;
+  padding-top: 10px;
+  padding-left: 3px;
 }
 
 .zoom-out {
@@ -218,8 +218,18 @@ svg {
   box-shadow: rgba(190, 60, 9, 0.25) 0px 13px 47px -5px, rgba(177, 57, 9, 0.25) 0px 8px 16px -8px;
 }
 
+.zoom-out-purchase {
+  transition: transform .3s;
+}
+
+.zoom-out-purchase:hover {
+  transform: scale(1.02);
+  
+}
+
 .search-input {
   border: 2px solid #de411b;
+  color: #585858;
 }
 
 
@@ -239,4 +249,9 @@ svg {
 
 .purchases {
   padding-bottom: 10px;
+}
+
+.filter-show-button {
+  background-color: #de411b;
+  border: 2px solid;
 }
